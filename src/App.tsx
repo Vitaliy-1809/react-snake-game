@@ -1,6 +1,5 @@
 import React from "react";
-import { Container, Grid, GridContainer, Overlay } from "./App.styles";
-import Button from "./components/Button";
+import { Container, Grid, GridContainer } from "./App.styles";
 import GridCell from "./components/GridCell";
 import {
   BOARD_SIZE_PX,
@@ -9,6 +8,7 @@ import {
   TOTAL_BOARD_CELLS_IN_A_ROW_NUM,
 } from "./utils/constants/constants";
 import { arrayDiff } from "./utils/helpers/getArrayDiff";
+import { getOverlay } from "./utils/helpers/getOverlay";
 import { shallowEquals } from "./utils/helpers/getShallowEquals";
 
 interface MyState {
@@ -231,26 +231,11 @@ class App extends React.Component<{}, MyState> {
       });
     });
 
-    let overlay;
-    if (this.state.status === 0) {
-      overlay = (
-        <Overlay>
-          <Button text="Start game!" onClick={this.startGame} />
-        </Overlay>
-      );
-    } else if (this.state.status === 2) {
-      overlay = (
-        <Overlay>
-          <div style={{ marginBottom: "1rem" }}>
-            <b>GAME OVER!</b>
-          </div>
-          <div style={{ marginBottom: "1rem" }}>
-            Your score: {this.state.snake.length}{" "}
-          </div>
-          <Button text="Start a new game" onClick={this.startGame} />
-        </Overlay>
-      );
-    }
+    const overlay = getOverlay(
+      this.state.status,
+      this.state.snake,
+      this.startGame
+    );
 
     return (
       <Container>
