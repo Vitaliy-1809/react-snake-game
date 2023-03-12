@@ -2,8 +2,8 @@ import React, { FC, MouseEventHandler } from "react";
 import { StyledButton } from "./Button.styles";
 
 export interface Props {
-  type: string;
   text: string;
+  type?: string;
   disabled?: boolean;
   onClick?: MouseEventHandler<HTMLButtonElement>;
 }

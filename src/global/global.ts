@@ -10,6 +10,8 @@ const GlobalStyles = createGlobalStyle`
   }
   
   body {
+    background-color: #7EA278;
+    overflow: hidden;
     font-family: -apple-system, BlinkMacSystemFont, 
       'Segoe UI', 'Roboto', 'Oxygen',
       'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',

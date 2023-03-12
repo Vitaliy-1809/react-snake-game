@@ -1,0 +1,4 @@
+export const FOOD_CHANGE_POSITION_INTERVAL_MS = 7000;
+export const SNAKE_MOVE_INTERVAL_MS = 180;
+export const BOARD_SIZE_PX = 800;
+export const TOTAL_BOARD_CELLS_IN_A_ROW_NUM = 35;
