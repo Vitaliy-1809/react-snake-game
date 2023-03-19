@@ -5,6 +5,7 @@ export const Container = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+  position: relative;
 `;
 
 export const GridContainer = styled.div`
@@ -12,15 +13,6 @@ export const GridContainer = styled.div`
   &:focus {
     outline: none;
   }
-`;
-
-export const Grid = styled.div`
-  box-sizing: content-box;
-  padding: 0;
-  border: 10px solid #333333;
-  border-radius: 10px;
-  display: flex;
-  flex-wrap: wrap;
 `;
 
 export const Overlay = styled.div`

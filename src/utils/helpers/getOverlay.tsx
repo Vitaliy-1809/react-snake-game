@@ -4,7 +4,8 @@ import Button from "../../components/Button";
 export const getOverlay = (
   status: number,
   snake: any[],
-  startGame: () => void
+  startGame: () => void,
+  resumeGame: () => void
 ) => {
   let overlay;
   if (status === 0) {
@@ -21,6 +22,12 @@ export const getOverlay = (
         </div>
         <div style={{ marginBottom: "1rem" }}>Your score: {snake.length} </div>
         <Button text="Start a new game" onClick={startGame} />
+      </Overlay>
+    );
+  } else if (status === 3) {
+    overlay = (
+      <Overlay>
+        <Button text="Game paused. Click to resume" onClick={resumeGame} />
       </Overlay>
     );
   }

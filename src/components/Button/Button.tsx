@@ -1,7 +1,7 @@
 import React, { FC, MouseEventHandler } from "react";
 import { StyledButton } from "./Button.styles";
 
-export interface Props {
+interface Props {
   text: string;
   type?: string;
   disabled?: boolean;

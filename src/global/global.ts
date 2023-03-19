@@ -27,12 +27,6 @@ const GlobalStyles = createGlobalStyle`
     'Courier New', monospace;
   }
 
-  ul {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-
   a {
     font-family: "Helvetica Neue", sans-serif;
     text-decoration: none;

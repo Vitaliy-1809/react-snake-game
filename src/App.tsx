@@ -1,5 +1,7 @@
 import React from "react";
-import { Container, Grid, GridContainer } from "./App.styles";
+import { Container, GridContainer } from "./App.styles";
+import GameMenu from "./components/GameMenu";
+import Grid from "./components/Grid";
 import GridCell from "./components/GridCell";
 import {
   BOARD_SIZE_PX,
@@ -16,6 +18,8 @@ interface MyState {
   snake: any;
   food: any;
   status: number;
+  newBoardBorderColor: boolean;
+  newSnakeColor: boolean;
 }
 
 class App extends React.Component<{}, MyState> {
@@ -29,25 +33,36 @@ class App extends React.Component<{}, MyState> {
     this.state = {
       snake: [],
       food: [],
-      // 0 = not started, 1 = in progress, 2 = finished
+      // 0 = not started, 1 = in progress, 2 = finished, 3 = paused
       status: 0,
       // using keycodes to indicate direction
-      direction: 39,
+      direction: 72,
+      newBoardBorderColor: false,
+      newSnakeColor: false,
     };
 
     this.moveFood = this.moveFood.bind(this);
     this.checkIfAteFood = this.checkIfAteFood.bind(this);
     this.startGame = this.startGame.bind(this);
     this.endGame = this.endGame.bind(this);
+    this.pauseGame = this.pauseGame.bind(this);
+    this.resumeGame = this.resumeGame.bind(this);
+    this.resetGame = this.resetGame.bind(this);
     this.moveSnake = this.moveSnake.bind(this);
     this.doesntOverlap = this.doesntOverlap.bind(this);
     this.setDirection = this.setDirection.bind(this);
     this.removeTimers = this.removeTimers.bind(this);
+    this.toggleBoardColor = this.toggleBoardColor.bind(this);
+    this.toggleSnakeColor = this.toggleSnakeColor.bind(this);
+    this.handleOnSnakeClick = this.handleOnSnakeClick.bind(this);
+    this.handleOnBoardClick = this.handleOnBoardClick.bind(this);
   }
 
   // randomly place snake food
   moveFood() {
     if (this.moveFoodTimeout) clearTimeout(this.moveFoodTimeout);
+    if (this.state.status === 3) return;
+
     const x = parseInt((Math.random() * this.numCells) as any);
     const y = parseInt((Math.random() * this.numCells) as any);
     this.setState({ food: [x, y] });
@@ -61,8 +76,8 @@ class App extends React.Component<{}, MyState> {
     // if it's the same direction or simply reversing, ignore
     let changeDirection = true;
     [
-      [38, 40],
-      [37, 39],
+      [84, 71],
+      [70, 72],
     ].forEach((dir) => {
       if (dir.indexOf(this.state.direction) > -1 && dir.indexOf(keyCode) > -1) {
         changeDirection = false;
@@ -76,25 +91,30 @@ class App extends React.Component<{}, MyState> {
     const newSnake = [];
     // set in the new "head" of the snake
     switch (this.state.direction) {
-      // down
-      case 40:
+      // G button (down)
+      case 71:
         newSnake[0] = [this.state.snake[0][0], this.state.snake[0][1] + 1];
         break;
-      // up
-      case 38:
+      // T button (up)
+      case 84:
         newSnake[0] = [this.state.snake[0][0], this.state.snake[0][1] - 1];
         break;
-      // right
-      case 39:
+      // H button (right)
+      case 72:
         newSnake[0] = [this.state.snake[0][0] + 1, this.state.snake[0][1]];
         break;
-      // left
-      case 37:
+      // F button(left)
+      case 70:
         newSnake[0] = [this.state.snake[0][0] - 1, this.state.snake[0][1]];
         break;
-      // Enter
-      case 13:
+      // Pause game case
+      case 0:
         return null;
+      // Command button
+      case 91:
+        return null;
+      default:
+        return this.resetGame();
     }
     // now shift each "body" segment to the previous segment's position
     [].push.apply(
@@ -195,7 +215,65 @@ class App extends React.Component<{}, MyState> {
     this.removeTimers();
     this.setState({
       status: 2,
+      newBoardBorderColor: false,
+      newSnakeColor: false,
     });
+  }
+
+  pauseGame() {
+    this.setState({
+      status: 3,
+      direction: 0,
+    });
+  }
+
+  resumeGame() {
+    this.setState({
+      status: 1,
+      direction: 72,
+    });
+  }
+
+  resetGame() {
+    this.removeTimers();
+    this.setState({
+      snake: [],
+      food: [],
+      status: 0,
+      direction: 72,
+      newBoardBorderColor: false,
+      newSnakeColor: false,
+    });
+  }
+
+  toggleBoardColor() {
+    this.setState((prevState) => ({
+      newBoardBorderColor: !prevState.newBoardBorderColor,
+    }));
+  }
+
+  toggleSnakeColor() {
+    this.setState((prevState) => ({
+      newSnakeColor: !prevState.newSnakeColor,
+    }));
+  }
+
+  handleOnBoardClick(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
+    if (e.metaKey) {
+      this.resetGame();
+    } else {
+      this.toggleBoardColor();
+    }
+  }
+
+  handleOnSnakeClick(
+    e: React.MouseEvent<HTMLDivElement, MouseEvent>,
+    snakeCell: any
+  ) {
+    if (!snakeCell) return;
+
+    e.stopPropagation();
+    this.toggleSnakeColor();
   }
 
   removeTimers() {
@@ -222,10 +300,13 @@ class App extends React.Component<{}, MyState> {
         return (
           <GridCell
             foodCell={foodCell}
-            snakeCell={snakeCell}
+            defaultSnakeCell={snakeCell}
+            yellowSnakeCell={snakeCell && this.state.newSnakeColor}
             regularCell={!foodCell && !snakeCell}
             size={cellSize}
             key={x + " " + y}
+            onClick={(e) => this.handleOnSnakeClick(e, snakeCell)}
+            onDoubleClick={this.pauseGame}
           />
         );
       });
@@ -234,11 +315,13 @@ class App extends React.Component<{}, MyState> {
     const overlay = getOverlay(
       this.state.status,
       this.state.snake,
-      this.startGame
+      this.startGame,
+      this.resumeGame
     );
 
     return (
       <Container>
+        <GameMenu />
         <GridContainer
           onKeyDown={this.setDirection}
           style={{
@@ -250,10 +333,8 @@ class App extends React.Component<{}, MyState> {
         >
           {overlay}
           <Grid
-            style={{
-              width: BOARD_SIZE_PX + "px",
-              height: BOARD_SIZE_PX + "px",
-            }}
+            newBoardBorderColor={this.state.newBoardBorderColor}
+            onClick={(e) => this.handleOnBoardClick(e)}
           >
             {cells}
           </Grid>
