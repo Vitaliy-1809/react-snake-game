@@ -110,11 +110,11 @@ class App extends React.Component<{}, MyState> {
       // Pause game case
       case 0:
         return null;
-      // Command button
+      // Command button ignore
       case 91:
         return null;
       default:
-        return this.resetGame();
+        return;
     }
     // now shift each "body" segment to the previous segment's position
     [].push.apply(
@@ -206,6 +206,7 @@ class App extends React.Component<{}, MyState> {
       status: 1,
       snake: [[5, 5]],
       food: [10, 10],
+      direction: 72,
     });
     //need to focus so keydown listener will work!
     this.el?.focus();
@@ -221,17 +222,24 @@ class App extends React.Component<{}, MyState> {
   }
 
   pauseGame() {
+    this.removeTimers();
     this.setState({
       status: 3,
-      direction: 0,
     });
   }
 
   resumeGame() {
+    this.moveSnakeInterval = setInterval(
+      this.moveSnake,
+      SNAKE_MOVE_INTERVAL_MS
+    );
+    this.moveFood();
+
     this.setState({
       status: 1,
-      direction: 72,
     });
+
+    this.el?.focus();
   }
 
   resetGame() {
